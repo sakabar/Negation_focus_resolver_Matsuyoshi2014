@@ -134,8 +134,6 @@ def zip_with_index(lst):
   return [(i, lst[i]) for i in xrange(0, len(lst))]
 
 def detect_focus_with_syntactic_pattern_while(knp_lines, cue_index):
-  ans = []
-
   knp_ind_tokens = [(i, line) for i, line in enumerate(knp_lines) if is_token(line) and i < cue_index]
   # 「hoge の 方 の」を後ろから調べるので、最後の「の」のインデックスは3になることはない。
   for i in xrange(len(knp_ind_tokens)-1, 3, -1):
@@ -143,14 +141,13 @@ def detect_focus_with_syntactic_pattern_while(knp_lines, cue_index):
     line = knp_ind_tokens[i][1]
 
     if(line.split(' ')[0] == 'の' and knp_ind_tokens[i-1][1].split(' ')[0] == '方' and knp_ind_tokens[i-2][1].split(' ')[0] == 'の'):
-      ans = get_chunk_tokens(knp_lines, knp_ind_tokens[i-2][0])
-      break
+      return get_chunk_tokens(knp_lines, knp_ind_tokens[i-2][0])
     elif((line.split(' ')[2] in ["、"]) or (line.split(' ')[9] == "基本条件形")):
       #FIXME
       #「~スルと」の場合が未実装
       break
 
-  return ans
+  return []
 
 #KNPの解析結果と、あるトークンのインデックスを引数にとり、
 #そのトークンが含まれているチャンクに関する行のインデックスを返す
@@ -301,6 +298,7 @@ def detect_foc(knp_lines, cue_index):
 
   #Sec 4.11
   if(len(foc_list) == 0):
+    print "hoge"
     foc_list = detect_focus_with_syntactic_pattern_while(knp_lines, cue_index)
 
   #Sec 4.12
