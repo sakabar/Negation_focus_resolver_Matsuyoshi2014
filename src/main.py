@@ -298,7 +298,6 @@ def detect_foc(knp_lines, cue_index):
 
   #Sec 4.11
   if(len(foc_list) == 0):
-    print "hoge"
     foc_list = detect_focus_with_syntactic_pattern_while(knp_lines, cue_index)
 
   #Sec 4.12
