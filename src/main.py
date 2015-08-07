@@ -258,7 +258,7 @@ def detect_foc(knp_lines, cue_index):
 
   #Sec 4.2
   if(len(foc_list) == 0):
-   keywords = """
+    keywords = """
 余り
 あまり
 大方
