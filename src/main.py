@@ -248,13 +248,14 @@ def detect_focus_with_ni_case_at_the_beginning_of_the_sentence(knp_lines, cue_in
 
 
 #KNPの解析結果とキューのインデックスを引数として、
-#焦点のインデックスのリストを返す
-#
+#焦点のインデックスのリストと判定に利用したルールのタプルを返す
 def detect_foc(knp_lines, cue_index):
-  foc_list = []
+  foc_list = [] #否定の焦点のインデックスのリスト
+  rule_id = -1      #判定の材料となったルールの番号
 
   #Sec 4.1
   foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["しか", "だけ", "まで", "ほど"])
+  rule_id = 1
 
   #Sec 4.2
   if(len(foc_list) == 0):
@@ -289,11 +290,13 @@ def detect_foc(knp_lines, cue_index):
 なかなか
 """[1:-1].split('\n')
     foc_list = detect_focus_with_keywords(knp_lines, cue_index, keywords)
+    rule_id = 2
 
   #Sec 4.3
   if(len(foc_list) == 0):
     #「時相名詞である」という条件を利用してメソッドを書いたほうがいい?
     foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["今回", "次回", "以来"])
+    rule_id = 3
 
   #Sec 4.4
   if(len(foc_list) == 0):
@@ -327,41 +330,51 @@ def detect_foc(knp_lines, cue_index):
 しじゅう
 """[1:-1].split('\n')
     foc_list = detect_focus_with_keywords(knp_lines, cue_index, keywords)
+    rule_id = 4
 
   #Sec 4.5
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["うまく", "上手く", "ゆっくり", "自然"])
+    rule_id = 5
 
   # #Sec 4.6
   # if(len(foc_list) == 0):
   #   #もし「乗り切れ ない」が「乗り 切れ ない」に分割されると「切れ」が焦点として判定される。
   #   foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["きれ", "切れ"])
+  #   rule_id = 6
 
   #Sec 4.7
   if(len(foc_list) == 0):
     #単語の先頭の「全」は見ていない。つまり、「全部」などは反応しない。
     foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["全", "全て", "すべて"])
+    rule_id = 7
 
   #Sec 4.8
   if(len(foc_list) == 0):
     #「では」、「での」
     foc_list = detect_focus_with_syntactic_pattern_as_for(knp_lines, cue_index)
+    rule_id = 8
+
 
   #Sec 4.9
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_immediate_ni_case(knp_lines, cue_index)
+    rule_id = 9
 
   #Sec 4.10
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_numeral_with_particle_mo(knp_lines, cue_index)
+    rule_id = 10
 
   #Sec 4.11
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_syntactic_pattern_while(knp_lines, cue_index)
+    rule_id = 11
 
   #Sec 4.12
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_locative_with_particle_wa(knp_lines, cue_index)
+    rule_id = 12
 
   #Sec 4.13
   #FIXME
@@ -369,6 +382,7 @@ def detect_foc(knp_lines, cue_index):
   #Sec 4.14
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_syntactic_pattern_for_adnominal_no_phrase(knp_lines, cue_index)
+    rule_id = 14
 
   #Sec 4.15
   #FIXME
@@ -376,25 +390,28 @@ def detect_foc(knp_lines, cue_index):
   #Sec 4.16
   if(len(foc_list) == 0):
     foc_list = detect_focus_with_ni_case_at_the_beginning_of_the_sentence(knp_lines, cue_index)
+    rule_id = 16
 
-  return foc_list
+  #1から16のどのルールにもヒットしなかったとき
+  if(len(foc_list) == 0):
+    rule_id = -1 #全体がスコープ
+
+  return (foc_list, rule_id)
 
 
 
 #文字列のリストを引数として取る
 #knp_linesは1つの文をKNPで解析した時の解析結果の文字列→'#'から始まり、"EOS"で終わるもの。1行がリストの1要素
-def sentence_func(knp_lines):
+def sentence_func(knp_lines, sentence_id):
   cues = get_cues(knp_lines)
   for cue_ind in cues:
-    foc_list = detect_foc(knp_lines, cue_ind)
-    sys.stdout.write("".join(map(lambda i: str(knp_lines[i].split(' ')[0]), foc_list))+ ",")
-
-    # sys.stdout.write(str(foc_list) + ",")
-  print ""
-
+    foc_list, rule_id = detect_foc(knp_lines, cue_ind)
+    foc_str = "".join(map(lambda i: str(knp_lines[i].split(' ')[0]), foc_list))
+    ans = [str(sentence_id), str(cue_ind), foc_str, knp_lines[cue_ind].split(' ')[0], str(rule_id)]
+    print (",".join(ans))
 
 def main():
-  # sentence_id = 1
+  sentence_id = 1
   knp_lines = []
 
   for line in sys.stdin:
@@ -402,8 +419,9 @@ def main():
     knp_lines.append(line)
 
     if line == "EOS":
-      sentence_func(knp_lines)
+      sentence_func(knp_lines, sentence_id)
       knp_lines = []
+      sentence_id += 1
 
 if __name__ == "__main__":
   main()
