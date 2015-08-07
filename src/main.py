@@ -258,7 +258,37 @@ def detect_foc(knp_lines, cue_index):
 
   #Sec 4.2
   if(len(foc_list) == 0):
-    foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["あまり", "なかなか", "ほぼ"])
+   keywords = """
+余り
+あまり
+大方
+大かた
+おお方
+おおかた
+大旨
+大むね
+おお旨
+概ね
+おおむね
+おおよそ
+凡そ
+およそ
+大抵
+大てい
+たい抵
+たいてい
+大体
+大たい
+だい体
+だいたい
+殆んど
+殆ど
+ほとんど
+ほぼ
+たっぷり
+なかなか
+"""[1:-1].split('\n')
+    foc_list = detect_focus_with_keywords(knp_lines, cue_index, keywords)
 
   #Sec 4.3
   if(len(foc_list) == 0):
@@ -267,7 +297,36 @@ def detect_foc(knp_lines, cue_index):
 
   #Sec 4.4
   if(len(foc_list) == 0):
-    foc_list = detect_focus_with_keywords(knp_lines, cue_index, ["頻繁に", "ひんぱんに", "しょっちゅう", "よく", "いつも"])
+    keywords = """
+頻繁に
+ひんぱんに
+ひん繁に
+頻ぱんに
+しょっちゅう
+よく
+いつも
+ときたま
+たまに
+めったに
+滅多に
+まれに
+稀に
+希に
+しばしば
+ときどき
+時どき
+時々
+時おり
+時折
+ときおり
+おりおり
+たえず
+絶えず
+しきりに
+常に
+しじゅう
+"""[1:-1].split('\n')
+    foc_list = detect_focus_with_keywords(knp_lines, cue_index, keywords)
 
   #Sec 4.5
   if(len(foc_list) == 0):
