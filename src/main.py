@@ -404,7 +404,21 @@ def detect_foc(knp_lines, cue_index):
 #knp_linesは1つの文をKNPで解析した時の解析結果の文字列→'#'から始まり、"EOS"で終わるもの。1行がリストの1要素
 def sentence_func(knp_lines, sentence_id):
   cues = get_cues(knp_lines)
-  for cue_ind in cues:
+  # for cue_ind in cues:
+  #   foc_list, rule_id = detect_foc(knp_lines, cue_ind)
+  #   foc_str = "".join(map(lambda i: str(knp_lines[i].split(' ')[0]), foc_list))
+  #   ans = [str(sentence_id), str(cue_ind), foc_str, knp_lines[cue_ind].split(' ')[0], str(rule_id)]
+  #   print (",".join(ans))
+
+
+  #一時的に、文内の全てのキューに対して処理を行うのではなく、文の末尾のキューに
+  #対してのみ処理を行うように変更した。
+  if(len(cues) == 0):
+    #キューが0コの時: KNPのフィルタリングが誤っている
+    ans = [str(sentence_id), "-1", "フィルタリングミス", "フィルタリングミス", "フィルタリングミス"]
+    print (",".join(ans))
+  else:
+    cue_ind = cues[-1]
     foc_list, rule_id = detect_foc(knp_lines, cue_ind)
     foc_str = "".join(map(lambda i: str(knp_lines[i].split(' ')[0]), foc_list))
     ans = [str(sentence_id), str(cue_ind), foc_str, knp_lines[cue_ind].split(' ')[0], str(rule_id)]
