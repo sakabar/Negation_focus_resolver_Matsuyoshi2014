@@ -97,7 +97,7 @@ def detect_focus_with_syntactic_pattern_as_for(knp_lines, cue_index):
 
 #Sec 4.9 Immediate 'ni' case
 def detect_focus_with_immediate_ni_case(knp_lines, cue_index):
-  ans = []
+  chunk_count = 0
 
   #「○○ に」を後ろから探索するので、indexは0にならないようにする。indexが0になると、その前を見ようとする時にindexが-1になり、リストの未尾を見てバグる
   for index in xrange(cue_index-1, 0, -1):
@@ -115,7 +115,14 @@ def detect_focus_with_immediate_ni_case(knp_lines, cue_index):
         #「~スルと」の場合が未実装
         break
 
-  return ans
+    elif(is_chunk(knp_lines[index])):
+      chunk_count += 1
+      #チャンク行で、-1[DP]ではない → 「キュー」の直前の行ではない → false
+      #問題は、否定要素のキューが文末ではない場合、か
+      if((not knp_lines[index].split(' ')[2].startswith("-1")) and chunk_count >= 2):
+        break
+
+  return []
 
 def detect_focus_with_numeral_with_particle_mo(knp_lines, cue_index):
   ans = []
