@@ -428,7 +428,8 @@ def sentence_func(knp_lines, sentence_id):
     cue_ind = cues[-1]
     foc_list, rule_id = detect_foc(knp_lines, cue_ind)
     foc_str = "".join(map(lambda i: str(knp_lines[i].split(' ')[0]), foc_list))
-    ans = [str(sentence_id), str(cue_ind), foc_str, knp_lines[cue_ind].split(' ')[0], str(rule_id)]
+    orig_str = "".join([l.split(' ')[0] for l in knp_lines if is_token(l)])
+    ans = [str(sentence_id), str(cue_ind), foc_str, knp_lines[cue_ind].split(' ')[0], str(rule_id), orig_str]
     print (",".join(ans))
 
 def main():
